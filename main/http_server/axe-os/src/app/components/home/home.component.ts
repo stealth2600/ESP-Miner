@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
-import { interval, map, Observable, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { interval, map, Observable, shareReplay, startWith, switchMap, tap, take } from 'rxjs';
 import { HashSuffixPipe } from 'src/app/pipes/hash-suffix.pipe';
 import { SystemService } from 'src/app/services/system.service';
 import { eASICModel } from 'src/models/enum/eASICModel';
 import { ISystemInfo } from 'src/models/ISystemInfo';
+import { GithubUpdateService } from 'src/app/services/github-update.service';
+
+const FIRMWARE_CHECK_INTERVAL = 43200; // 12 hours in seconds
 
 @Component({
   selector: 'app-home',
@@ -29,8 +32,14 @@ export class HomeComponent {
   public maxTemp: number = 75;
   public maxFrequency: number = 800;
 
+  public lastFirmwareCheck: number = 0;
+  public newRelease: boolean = false;
+  public latestRelease: any;
+  public latestRelease$: Observable<any>;
+
   constructor(
-    private systemService: SystemService
+    private systemService: SystemService,
+    private githubUpdateService: GithubUpdateService
   ) {
 
     const documentStyle = getComputedStyle(document.documentElement);
@@ -119,6 +128,10 @@ export class HomeComponent {
       }
     };
 
+    this.checkForLatestRelease();
+    this.latestRelease$ = this.githubUpdateService.getReleases().pipe(
+      map(releases => releases[0])
+    );
 
     this.info$ = interval(5000).pipe(
       startWith(() => this.systemService.getInfo()),
@@ -149,6 +162,13 @@ export class HomeComponent {
         this.maxTemp = Math.max(75, info.temp);
         this.maxFrequency = Math.max(800, info.frequency);
 
+        if (this.latestRelease && this.latestRelease?.tag_name !== info.version) {
+          this.newRelease = true;
+        }
+        else if(this.latestRelease && this.latestRelease?.tag_name === info.version) {
+          this.newRelease = false;
+        }
+        
       }),
       map(info => {
         info.power = parseFloat(info.power.toFixed(1))
@@ -207,6 +227,16 @@ export class HomeComponent {
       })
     )
 
+    this.info$.subscribe(info => {
+      const value = new Date().getTime() - info.uptimeSeconds * 1000;
+      const currentTime = Math.floor((+new Date() - +new Date(value)) / 1000);
+
+      //Get the release from GitHub every 12 hours
+      if( this.newRelease !== true && this.lastFirmwareCheck + FIRMWARE_CHECK_INTERVAL < currentTime) {
+        this.lastFirmwareCheck = currentTime;
+        this.checkForLatestRelease();
+      }
+    });
   }
 
   private calculateAverage(data: number[]): number {
@@ -214,5 +244,16 @@ export class HomeComponent {
     const sum = data.reduce((sum, value) => sum + value, 0);
     return sum / data.length;
   }
+
+  private checkForLatestRelease(): void {
+    this.githubUpdateService.getReleases().pipe(
+      take(1),
+      map(releases => releases[0])
+    ).subscribe({
+      next: latestRelease => {
+        this.latestRelease = latestRelease;
+      }
+    });
+  }  
 }
 

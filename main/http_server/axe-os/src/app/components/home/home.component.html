@@ -12,8 +12,8 @@
     <div class="grid" *ngIf="info$ | async as info; else loading">
         <div class="col-12">
             <div class="card">
-                <div class="grid mb-4">
-                    <div class="col-12 md:col-6 xl:col-3">
+                <div class="grid-10 mb-4">
+                    <div class="col-10-10 md:col-5-10 xl:col-2-10">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -32,7 +32,7 @@
                             </ng-container>
                         </div>
                     </div>
-                    <div class="col-12 md:col-6 xl:col-3">
+                    <div class="col-10-10 md:col-5-10 xl:col-2-10">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -48,7 +48,7 @@
                             <span class="text-500">rejected</span>
                         </div>
                     </div>
-                    <div class="col-12 md:col-6 xl:col-3">
+                    <div class="col-10-10 md:col-5-10 xl:col-2-10">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -72,7 +72,7 @@
                             <span class="text-500">since last week</span> -->
                         </div>
                     </div>
-                    <div class="col-12 md:col-6 xl:col-3">
+                    <div class="col-10-10 md:col-5-10 xl:col-2-10">
                         <div class="card mb-0">
                             <div class="flex justify-content-between mb-3">
                                 <div>
@@ -92,7 +92,46 @@
                             <span class="text-500">newly registered</span> -->
                         </div>
                     </div>
-
+                    <div class="col-10-10 md:col-5-10 xl:col-2-10">
+                        <div class="card mb-0">
+                            <div class="flex justify-content-between mb-3">
+                                <div>
+                                    <span class="block text-500 font-medium mb-3">Uptime</span>
+                                    <div class="text-900 font-medium text-xl">{{info.uptimeSeconds | uptimeSince}}</div>
+                                </div>
+                                <div class="flex align-items-center justify-content-center bg-orange-100 border-round"
+                                    [ngStyle]="{width: '2.5rem', height: '2.5rem'}">
+                                    <i class="pi pi-stopwatch text-orange-500 text-xl"></i>
+                                </div>
+                            </div>
+                            <ng-container *ngIf="latestRelease$ | async as latestRelease">
+                                <div *ngIf="newRelease == true" style="display: flex; flex-wrap: wrap; align-items: center;">
+                                    <span class="text-500" style="margin-right: 5px;">New Release:</span>
+                                    <a class="text-900" style="text-decoration: underline; margin-right: 5px;" target="_blank" [href]="'https://github.com/skot/ESP-Miner'" title="View Github Repository">
+                                        {{latestRelease.tag_name}}
+                                    </a>
+                                    <div style="display: flex; align-items: center;">
+                                        <div *ngFor="let asset of latestRelease.assets" style="display: flex; align-items: center;">
+                                            <div *ngIf="asset.name == 'esp-miner.bin'" style="margin-right: 5px;">
+                                                <a style="text-decoration: none;" target="_blank" [href]="asset.browser_download_url" title="Download esp-miner.bin">
+                                                    <i class="pi pi-wrench"></i>
+                                                </a>
+                                            </div>
+                                            <div *ngIf="asset.name == 'www.bin'" style="margin-right: 5px;">
+                                                <a style="text-decoration: none;" target="_blank" [href]="asset.browser_download_url" title="Download www.bin">
+                                                    <i class="pi pi-globe"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="newRelease == false">
+                                    <span class="text-500" style="margin-right: 5px;">Firmware Version:</span>
+                                    <span class="text-900 font-medium">{{info.version}} </span>
+                                </div>
+                            </ng-container>                         
+                        </div>
+                    </div>
                 </div>
 
 
