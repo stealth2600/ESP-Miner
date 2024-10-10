@@ -6,3 +6,26 @@
 .card {
     min-height: 100%;
 }
+
+.grid-10 {
+    display: grid;
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+    gap: 1rem; // Adjust the gap as needed
+    width: 100%;
+}
+
+@for $i from 1 through 10 {
+    .col-#{$i}-10 { grid-column: span $i; }
+}
+
+@media (min-width: 768px) {
+    @for $i from 1 through 10 {
+        .md\:col-#{$i}-10 { grid-column: span $i; }
+    }
+}
+
+@media (min-width: 1200px) {
+    @for $i from 1 through 10 {
+        .xl\:col-#{$i}-10 { grid-column: span $i; }
+    }
+}

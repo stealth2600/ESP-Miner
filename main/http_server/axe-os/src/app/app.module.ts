@@ -20,10 +20,10 @@ import { SettingsComponent } from './components/settings/settings.component';
 import { SwarmComponent } from './components/swarm/swarm.component';
 import { AppLayoutModule } from './layout/app.layout.module';
 import { ANSIPipe } from './pipes/ansi.pipe';
-import { DateAgoPipe } from './pipes/date-ago.pipe';
 import { HashSuffixPipe } from './pipes/hash-suffix.pipe';
 import { PrimeNGModule } from './prime-ng.module';
 import { MessageModule } from 'primeng/message';
+import { UptimeSincePipe } from './pipes/uptime-since.pipe';
 
 const components = [
   AppComponent,
@@ -41,10 +41,10 @@ const components = [
     ...components,
 
     ANSIPipe,
-    DateAgoPipe,
     SwarmComponent,
     SettingsComponent,
-    HashSuffixPipe
+    HashSuffixPipe,
+    UptimeSincePipe
   ],
   imports: [
     BrowserModule,
